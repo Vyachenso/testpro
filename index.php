@@ -1,38 +1,43 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
+use JasonGrimes\Paginator;
+require __DIR__ . '/config.php';
+require __DIR__ . '/service.php';
+require __DIR__ . '/vendor/autoload.php';
 
-include("config.php");
-require('service.php');
+$data = array();
+$accepted_keys = array('county', 'country', 'town', 'num_bedrooms', 'price_min', 'price_max', 'page', 'type');
+
+
+foreach ($_GET as $key => $value)
+{
+    if(in_array($key, $accepted_keys)) {
+        $data[$key] = $value;
+    }
+
+}
+unset($data['form_submit']);
 
 $line = new service($host, $user_db, $pass, $db);
-$county = $line->get_county();
-$bedrooms = $line->get_bedrooms();
-$price = $line->get_price();
-$property_types = $line->get_property_types();
-
-$where = array();
-
-if (isset($_GET['county'])) {
-    $where['county'] = $_GET['county'];
-}
-if (isset($_GET['country'])) {
-    $where['country'] = $_GET['country'];
-}
-if (isset($_GET['town'])) {
-    $where['town'] = $_GET['town'];
-}
-if (isset($_GET['num_bedrooms'])) {
-    $where['num_bedrooms'] = $_GET['num_bedrooms'];
-}
-if (isset($_GET['price'])) {
-    $where['price'] = $_GET['price'];
-}
+$county = $line->get_county($data);
+$country = $line->get_country($data);
+$town = $line->get_town($data);
+$bedrooms = $line->get_bedrooms($data);
+$price = $line->get_price($data);
+$property_types = $line->get_property_types($data);
 
 if (empty($_GET['id'])) {
-    $propertys = $line->get_propertys($where);
+    $propertys = $line->get_propertys($data);
 } else {
     $property = $line->get_property($_GET['id']);
 }
+
+$totalItems = $propertys['count'] ?? 0;
+$itemsPerPage = 90;
+$currentPage = $data['page'] ?? 0;
+unset($data['page']);
+$urlPattern = '?' . http_build_query($data) . '&page=(:num)';
+$paginator = new Paginator($totalItems, $itemsPerPage, $currentPage, $urlPattern);
 
 include __DIR__ . '/templates/home.php';

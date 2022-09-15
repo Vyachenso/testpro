@@ -8,7 +8,7 @@ require('../service.php');
 $line = new service($host, $user_db, $pass, $db);
 
 if(isset($_GET['county'])) {
-$country = $line->get_country($_GET['county']);
+$country = $line->get_country($_GET);
 
     if (isset($country)) {
         print "<h3>country</h3><br><select id='country' name='country' class='form-control form-select form-select-lg mb-3 w-50'>
@@ -22,7 +22,7 @@ $country = $line->get_country($_GET['county']);
 }
 
 if(isset($_GET['country'])) {
-    $town = $line->get_town($_GET['country']);
+    $town = $line->get_town($_GET);
 
     if (isset($town)) {
         print "<h3>town</h3><br><select id='town' name='town' class='form-control form-select form-select-lg mb-3 w-50'>

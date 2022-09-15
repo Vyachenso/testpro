@@ -3,6 +3,4 @@
 $host = "localhost";
 $user_db = "root";
 $pass = "";
-$db = "db";
-
-
+$db = "";
